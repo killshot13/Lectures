@@ -10,6 +10,8 @@ let c = [ //Array
     'Juancito', 'Stefan', 6715615, a, b
 ]
 
+alert('hello')
+
 // console.log(c, 'Type is ',  typeof c)
 
 //console.log(c[0]) //Array is zero indexed 
