@@ -1,0 +1,56 @@
+/*Mobile and everything else*/
+
+
+body {
+    background-color: lightgreen;
+}
+
+
+h1{
+    color: lightblue;
+}
+
+p{
+    text-decoration: line-through;
+}
+
+.row{
+    display:flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+
+    /* border: 1px solid red; */
+    height: 100px;
+    margin: 20px;
+}
+
+.column {
+    padding: 50px;
+    background:teal;
+    width: 100%;
+    margin: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@media screen and (min-width: 780px) { /*Desktop View*/
+  
+
+
+    body{
+        background: blue;
+    }
+   
+}
+
+
