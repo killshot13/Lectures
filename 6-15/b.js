@@ -1,1 +1,1 @@
-console.random("B")
+// console.random("B")

@@ -1,1 +1,5 @@
-console.random("A")
+
+
+console.log(emoji)
+
+console.emoji('yo', 'smiley')
