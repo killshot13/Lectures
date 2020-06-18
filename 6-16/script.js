@@ -12,7 +12,7 @@ let mice = [
 
 function fillTheMice(){
     document.querySelectorAll('.mouse').forEach((domMouse,i) => {
-        console.log(`Replace ${domMouse.innerHTML} with ${mice[i]}`)
+        // console.log(`Replace ${domMouse.innerHTML} with ${mice[i]}`)
         domMouse.innerHTML =  mice[i]
     })
 }
@@ -20,7 +20,7 @@ function fillTheMice(){
 
 function killTheMice(){
     document.querySelectorAll('.mouse').forEach((domMouse,i) => {
-        console.log(`Replace ${domMouse.innerHTML} with X`)
+        // console.log(`Replace ${domMouse.innerHTML} with X`)
         domMouse.innerHTML =  "X"
     })
 }
@@ -28,12 +28,13 @@ function killTheMice(){
 
 ///Event Listeners 
 document.querySelector('#fill').onclick = function(){ //I clicked Fill
-    log('filling', 'mouse')
+    let line = new Error().stack.match(/\(([^()]+)\)/g)[0].split('/').pop().replace(')','')
+    log('filling mouse')
     fillTheMice()
 }
 
 document.querySelector('#kill').onclick = function(){ //I clicked Kill
-    log('killing', 'boom')
+    log('killing boom')
     killTheMice()
 }
 

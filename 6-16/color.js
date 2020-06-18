@@ -14,16 +14,30 @@ Object.prototype.random = function(arg){
 
 let count = 0; 
 Object.prototype.emoji = function(arg, feeling){
+    //console.log(arg, feeling, x, this.memory, this.trace(), this.dir('dfs'), this.context(), this.count() )
+    this.clear()    
+
+
+    let words = arg.split(' ')
+    let emo = emoji['smiley']
+    for(word of words){        
+        if(emoji[word]){        
+            emo = emoji[word]
+            break
+        }
+    }
+
     count++
     if(typeof arg != 'string'){
-        return ( console.log(emoji[feeling] ? emoji[feeling] : '', arg) )
+        return ( this.log(emo, arg) )
     } else {
         return ( 
-            console.log(`%c${emoji[feeling] ? emoji[feeling] : ''} ${arg} `, 
+            this.trace(`%c${emo} ${arg} `, 
             `
                 color:${"#"+((1<<24)*Math.random()|0).toString(16)}; 
                 transition: all 1s; 
                 font-size: 16px;
+                animation: cool 2s infinite;
             `
             ) 
         )
@@ -31,6 +45,7 @@ Object.prototype.emoji = function(arg, feeling){
 }
 
 function log(arg, feeling){
+    
     return console.emoji(arg, feeling)
  } 
 
