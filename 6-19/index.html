@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+    <style>
+      canvas{
+          border: 1px dashed red;
+      }
+      body{ /*You don't see the scroll bar when clickign up and down**/
+          overflow:hidden;
+      }
+  </style>
+  </head>
+  <body>
+
+
+    <canvas id="myCanvas"></canvas>
+
+
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+  <script>
+
+    const socket = io();
+
+
+
+
+
+const canvas = document.querySelector('#myCanvas')
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const ctx = canvas.getContext('2d') //You just always need this
+
+
+
+
+class War {
+  constructor(){
+    this.vikingArmy  = [] //ryan
+    this.saxonArmy   = []
+  }
+  
+  addViking=(soldier)=>{
+    this.vikingArmy.push(soldier) //ryan
+  }
+  
+  addSaxon=(solider)=>{
+    this.saxonArmy.push(solider)
+  }
+
+  vikingAttack=(viking)=>{
+
+    let saxon   = this.saxonArmy[0]
+
+    let inRange = detectCollision(saxon, viking)
+    console.log('inRange ', inRange)
+    if(inRange)
+      return saxon.receiveDamage(viking.strength)
+  }
+  saxonAttack=(saxon)=>{
+
+    let viking  = this.vikingArmy[0]
+
+    let inRange = detectCollision(saxon, viking)
+    console.log('inRange ', inRange)
+    if(inRange)
+      return viking.receiveDamage(saxon.strength)
+  }
+}
+
+
+// Soldier
+class Soldier {
+  constructor({health, strength, x, y, width, height, color}) {
+    this.health = health;
+    this.strength = strength;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color; //color will be replaced by image
+  }
+
+  drawSolider = () => {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.width, this.height)
+  }
+
+}
+
+// Viking
+class Viking extends Soldier {
+  constructor({name, health, strength, x, y, width, height, color, drawSolider }) {
+    super({health, strength, x, y, width, height, color, drawSolider });
+    this.name = name;
+  }
+
+  attack = () => {
+    war.vikingAttack(this)
+  }
+
+  receiveDamage = (theDamage) => {
+    this.health -= theDamage;
+    console.log(this.health)
+
+    if (this.health > 0) {
+      return `${this.name} has received ${theDamage} points of damage`;
+    } else {
+      return `${this.name} has died in act of combat`;
+    }
+  };
+  battleCry = () => {
+    return "Odin Owns You All!";
+  };
+}
+
+// Saxon
+class Saxon extends Soldier {
+  constructor({name, health, strength, x, y, width, height, color, drawSolider}) {
+    super({health, strength, x, y, width, height, color, drawSolider});
+    this.name = name;
+  }
+
+
+  attack = () => {
+    war.saxonAttack(this)
+  }
+
+  receiveDamage = (damage) => {
+    
+    this.health -= damage
+
+    if(this.health > 0){
+        return `A Saxon has received ${damage} points of damage`
+    } else {
+        this.color = 'black'
+        return `A Saxon has died in combat`
+    }
+  }
+
+}
+
+
+
+const war = new War()
+
+const thor = new Viking({name:"Thor", x:10, y:50, health: 1000, strength: 500, width: 50, height:50,  color:'red'})
+const thanos = new Saxon({name:"Thanos", x:100, y:50, health: 1000, strength: 500, width: 50, height:50,  color:'blue'})
+
+war.addViking(thor)
+war.addSaxon(thanos)
+
+
+/**SOCKET PART MULTIPLAYER*/
+socket.on("ArrowUp", () => {
+  thor.y -= 10
+})
+
+socket.on("ArrowDown", () => {
+  thor.y += 10
+})
+
+socket.on("ArrowLeft", () => {
+  thor.x -= 10
+})
+
+socket.on("ArrowRight", () => {
+  thor.x += 10
+})
+
+socket.on("Attack", ()=> {
+  thor.attack()
+})
+
+document.onkeydown = (e) => {
+  switch(e.key){
+    case "ArrowUp":
+      socket.emit("ArrowUp")
+      break;
+    case "ArrowDown":
+      socket.emit("ArrowDown")
+      break;
+    case "ArrowLeft":
+      socket.emit("ArrowLeft")
+      break;
+    case "ArrowRight":
+      socket.emit("ArrowRight")
+      break;
+    case " ":
+      socket.emit("Attack")
+      break;
+    case "w":
+      break;
+    case "a":
+      break;
+    case "s":
+      break;
+    case "d":
+      break      
+  }
+}
+/**SOCKET PART MULTIPLAYER*/
+
+
+
+function animate(){  //Game Engine
+  window.requestAnimationFrame(animate)
+  ctx.clearRect(0,0,canvas.width, canvas.height)
+  thor.drawSolider()
+  thanos.drawSolider()
+
+}
+animate()
+
+
+
+function detectCollision(rect1, rect2){
+  if (rect1.x < rect2.x + rect2.width &&
+    rect1.x + rect1.width > rect2.x &&
+    rect1.y < rect2.y + rect2.height &&
+    rect1.y + rect1.height > rect2.y) {
+      // collision detected!
+      return true
+  }
+  return false
+}
+
+
+
+
+
+</script>
+</html>
